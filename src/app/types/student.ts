@@ -5,6 +5,7 @@ export interface Student {
 }
 
 export interface StudentFormData {
-  fullName: string;
-  age: number;
+  firstName: string;
+  lastName: string;
+  birthDate: string;
 }

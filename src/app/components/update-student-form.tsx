@@ -22,7 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import type { StudentFormData } from "../types/student";
+import type { Student, StudentFormData } from "../types/student";
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -36,23 +36,31 @@ const formSchema = z.object({
   }),
 });
 
-interface StudentFormProps {
-  onSubmit: (data: StudentFormData) => void;
+interface UpdateStudentFormProps {
+  student: Student;
+  onSubmit: (id: number, data: StudentFormData) => void;
 }
 
-export function StudentForm({ onSubmit }: StudentFormProps) {
+export function UpdateStudentForm({
+  student,
+  onSubmit,
+}: UpdateStudentFormProps) {
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      birthDate: "",
+      firstName: student.fullName.split(" ")[0],
+      lastName: student.fullName.split(" ")[1] || "",
+      birthDate: new Date(
+        new Date().setFullYear(new Date().getFullYear() - student.age)
+      )
+        .toISOString()
+        .split("T")[0],
     },
   });
 
   function handleSubmit(values: z.infer<typeof formSchema>) {
-    onSubmit(values);
+    onSubmit(student.studentId, values);
     form.reset();
     setOpen(false);
   }
@@ -60,11 +68,13 @@ export function StudentForm({ onSubmit }: StudentFormProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Add Student</Button>
+        <Button variant="default" size="sm" className="w-20">
+          Update
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Student</DialogTitle>
+          <DialogTitle>Update Student</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -78,7 +88,7 @@ export function StudentForm({ onSubmit }: StudentFormProps) {
                 <FormItem>
                   <FormLabel>First Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="John" {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -91,7 +101,7 @@ export function StudentForm({ onSubmit }: StudentFormProps) {
                 <FormItem>
                   <FormLabel>Last Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Doe" {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -111,7 +121,7 @@ export function StudentForm({ onSubmit }: StudentFormProps) {
               )}
             />
             <Button type="submit" className="w-full">
-              Submit
+              Update Student
             </Button>
           </form>
         </Form>
